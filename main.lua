@@ -8,7 +8,9 @@ function love.load()
 
 --stores score
   score = 0
-  timer = 0
+
+  --game timer
+  timer = 10
 
 --sets default font
   myFont = love.graphics.newFont(50)
@@ -16,7 +18,13 @@ end
 
 --update loop called everyframe
 function love.update(dt)
-
+  if timer > 0 then
+    --counts in real time making game count down per second
+    timer = timer - dt
+  end
+  if timer < 0 then
+    timer = 0
+  end
 end
 
 --draws graphics to the screen runs everyframe
@@ -32,6 +40,8 @@ function love.draw()
   love.graphics.setFont(myFont)
   love.graphics.setColor(1, 1, 0, 1)
   love.graphics.print(score)
+  --rounds number up to nearest integer
+  love.graphics.print(math.ceil(timer), 100, 0)
 
 end
 
@@ -39,8 +49,14 @@ end
 function love.mousepressed(x, y, b)
 --1 is left most button
   if b == 1 then
+    --checks if mouse in in circle
     if DistanceBetween(button.x, button.y, love.mouse.getX(), love.mouse.getY()) < button.size then
+      --adds to score
       score = score + 1
+      --random position on screen accounting for circle size/radius preventing circle from going off screen
+      button.x = math.random(button.size, love.graphics.getWidth() - button.size)
+      button.y = math.random(button.size, love.graphics.getHeight() - button.size)
+
     end
   end
 end
