@@ -12,18 +12,24 @@ function love.load()
   --game timer
   timer = 10
 
+  --gamestate, 1 is menu, 2 is playing/started
+  gameState = 1
+
 --sets default font
   myFont = love.graphics.newFont(50)
 end
 
 --update loop called everyframe
 function love.update(dt)
-  if timer > 0 then
-    --counts in real time making game count down per second
-    timer = timer - dt
-  end
-  if timer < 0 then
-    timer = 0
+  if gameState == 2 then
+    if timer > 0 then
+      --counts in real time making game count down per second
+      timer = timer - dt
+    end
+    if timer < 0 then
+      timer = 0
+      gameState = 1
+    end
   end
 end
 
@@ -32,23 +38,29 @@ function love.draw()
 --  love.graphics.setColor(0, 0, 1, 1)
   --draws rectangle, filled/outline, posx, posy, width, hight
 --  love.graphics.rectangle("fill", 200, 400, 200, 100)
-
-  love.graphics.setColor(1, 0, 0, 1)
-  love.graphics.circle("fill", button.x, button.y, button.size)
-
+  if gameState == 2 then
+    love.graphics.setColor(1, 0, 0, 1)
+    love.graphics.circle("fill", button.x, button.y, button.size)
+  end
 --resets font to default defined in load
   love.graphics.setFont(myFont)
   love.graphics.setColor(1, 1, 0, 1)
-  love.graphics.print(score)
+  -- the ".." prints out text then connects the string with the actual score value
+  love.graphics.print("Score: " .. score)
   --rounds number up to nearest integer
-  love.graphics.print(math.ceil(timer), 100, 0)
+  love.graphics.printf("Time: " .. math.ceil(timer), love.graphics.getWidth() / 2, 0, love.graphics.getWidth() / 2, "center")
+
+  if gameState == 1 then
+    --centers message on screen, printf comes with these capabilites
+    love.graphics.printf("Click anywhere to play!", 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), "center")
+  end
 
 end
 
 --overriding default mouse press function
 function love.mousepressed(x, y, b)
---1 is left most button
-  if b == 1 then
+--1 is left most button and game is started/playing
+  if b == 1 and gameState == 2 then
     --checks if mouse in in circle
     if DistanceBetween(button.x, button.y, love.mouse.getX(), love.mouse.getY()) < button.size then
       --adds to score
@@ -58,6 +70,12 @@ function love.mousepressed(x, y, b)
       button.y = math.random(button.size, love.graphics.getHeight() - button.size)
 
     end
+  end
+
+  --stats game when mouse is clicked and set timer to 10
+  if gameState == 1 then
+    gameState = 2
+    timer = 10
   end
 end
 
